@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MoneyControl</string>
+    <string name="add_transaction">Добавяне на движение</string>
+    <string name="date">Дата</string>
+    <string name="category">Категория</string>
+    <string name="subcategory">Подкатегория</string>
+    <string name="amount">Сума</string>
+    <string name="description">Описание</string>
+    <string name="add">Добавяне</string>
+</resources>
