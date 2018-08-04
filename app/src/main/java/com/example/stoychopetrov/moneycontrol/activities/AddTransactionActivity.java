@@ -1,6 +1,7 @@
 package com.example.stoychopetrov.moneycontrol.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -63,6 +64,7 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
     private void setListeners(){
         mBackArrowImg.setOnClickListener(this);
         mDateEdt.setOnClickListener(this);
+        mCategoryEdt.setOnClickListener(this);
     }
 
     private void showDatePicker(){
@@ -91,11 +93,20 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
                 calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    private void startCategoryActivity(){
+        Intent intent = new Intent(this, CategoriesActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onClick(View v) {
         if(v.getId() == mBackArrowImg.getId())
             onBackPressed();
         else if(v.getId() == mDateEdt.getId())
             showDatePicker();
+        else if(v.getId() == mCategoryEdt.getId())
+            startCategoryActivity();
+        else if(v.getId() == mSubCategoryEdt.getId())
+            startCategoryActivity();
     }
 }
