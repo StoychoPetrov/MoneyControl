@@ -1,9 +1,18 @@
 package com.example.stoychopetrov.moneycontrol.models;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "income_expenses_table")
+@Entity(tableName = "income_expenses_table", indices = {@Index("mCategoryId")}, foreignKeys = {
+        @ForeignKey(
+                entity = CategoryModel.class,
+                parentColumns = "mId",
+                childColumns = "mCategoryId"
+        )
+})
+
 public class IncomeExpensesModel {
 
     @PrimaryKey(autoGenerate = true)
@@ -13,6 +22,7 @@ public class IncomeExpensesModel {
     private String  mDate;
     private String  mDescription;
     private boolean mIsDebit;
+    private long    mCategoryId;
 
     public long getId() {
         return mId;
@@ -52,5 +62,13 @@ public class IncomeExpensesModel {
 
     public void setDescription(String mDescription) {
         this.mDescription = mDescription;
+    }
+
+    public long getCategoryId() {
+        return mCategoryId;
+    }
+
+    public void setCategoryId(long mCategoryId) {
+        this.mCategoryId = mCategoryId;
     }
 }

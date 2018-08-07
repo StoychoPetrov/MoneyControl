@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,9 @@ public class CreateCategoryDialog extends Dialog{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_new_category);
 
+        if(getWindow() != null)
+            getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
         initUI();
     }
 
@@ -53,11 +57,12 @@ public class CreateCategoryDialog extends Dialog{
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(categoryName.getText().toString().isEmpty())
                     Toast.makeText(mContext, R.string.please_type_name, Toast.LENGTH_SHORT).show();
-                else if(mListener != null)
+                else if(mListener != null) {
+                    dismiss();
                     mListener.onSaveClicked(categoryName.getText().toString());
+                }
             }
         });
     }

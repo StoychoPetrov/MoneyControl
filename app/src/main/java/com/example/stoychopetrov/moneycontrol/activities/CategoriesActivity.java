@@ -1,5 +1,6 @@
 package com.example.stoychopetrov.moneycontrol.activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.example.stoychopetrov.moneycontrol.MoneyControlDatabase;
 import com.example.stoychopetrov.moneycontrol.R;
 import com.example.stoychopetrov.moneycontrol.customClasses.CreateCategoryDialog;
+import com.example.stoychopetrov.moneycontrol.customClasses.Utils;
 import com.example.stoychopetrov.moneycontrol.interfaces.CategoryDao;
 import com.example.stoychopetrov.moneycontrol.models.CategoryModel;
 
@@ -23,23 +25,28 @@ import java.util.List;
 public class CategoriesActivity extends AppCompatActivity
         implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-    private ImageView               mBackArrowImg;
-    private ListView                mCategoriesListView;
-    private FloatingActionButton    mAddBtn;
-    private TextView                mNoCategoriesTxt;
+    private ImageView                   mBackArrowImg;
+    private ListView                    mCategoriesListView;
+    private FloatingActionButton        mAddBtn;
+    private TextView                    mNoCategoriesTxt;
 
-    private ArrayList<String>       mCategoriesTitlesArrayList = new ArrayList<>();
-    private ArrayAdapter<String>    mCategoriesAdapter;
+    private ArrayList<String>           mCategoriesTitlesArrayList  = new ArrayList<>();
+    private ArrayList<CategoryModel>    mCategoriesArrayList        = new ArrayList<>();
+    private ArrayAdapter<String>        mCategoriesAdapter;
+
+    private boolean                     mIsSubcategory              = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
+        mIsSubcategory = getIntent().getBooleanExtra(Utils.INTENT_EXTRA_SUBCATEGORY, false);
+
         initUI();
         setListeners();
-
-        setData();
+        setAdapter();
+        selectData();
     }
 
     private void initUI(){
@@ -47,6 +54,8 @@ public class CategoriesActivity extends AppCompatActivity
         mCategoriesListView     = findViewById(R.id.categories_listview);
         mAddBtn                 = findViewById(R.id.add_btn);
         mNoCategoriesTxt        = findViewById(R.id.no_categories_txt);
+
+        ((TextView) findViewById(R.id.title_txt)).setText(R.string.choose_category);
     }
 
     private void setListeners(){
@@ -55,26 +64,22 @@ public class CategoriesActivity extends AppCompatActivity
         mAddBtn.setOnClickListener(this);
     }
 
-    private void setData(){
-
-        ((TextView) findViewById(R.id.title_txt)).setText(R.string.choose_category);
-
-        CrudDatabase crudDatabase = new CrudDatabase();
+    private void selectData(){
+        CrudDatabase crudDatabase = new CrudDatabase(true, "");
         crudDatabase.execute();
     }
 
     private void setAdapter(){
         mCategoriesAdapter = new ArrayAdapter<String>(this, R.layout.item_category, R.id.category_name_txt, mCategoriesTitlesArrayList);
         mCategoriesListView.setAdapter(mCategoriesAdapter);
-
-        mNoCategoriesTxt.setVisibility(mCategoriesTitlesArrayList.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void showCreateCategoryDialog(){
-        CreateCategoryDialog dialog = new CreateCategoryDialog(this, new CreateCategoryDialog.ButtonsClickedListener() {
+        final CreateCategoryDialog dialog = new CreateCategoryDialog(this, new CreateCategoryDialog.ButtonsClickedListener() {
             @Override
             public void onSaveClicked(String categoryName) {
-
+                CrudDatabase crudDatabase = new CrudDatabase(false, categoryName);
+                crudDatabase.execute();
             }
         });
         dialog.show();
@@ -90,30 +95,61 @@ public class CategoriesActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent();
+        intent.putExtra(Utils.INTENT_EXTRA_CATEGORY_NAME, mCategoriesArrayList.get(position));
 
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     class CrudDatabase extends AsyncTask<Void, Void, Void> {
 
+        private boolean isSelectCategories       = true;
+        private String  mCategoryName            = "";
+        final MoneyControlDatabase mDatabase     = MoneyControlDatabase.getDatabase(CategoriesActivity.this);
+
+        public CrudDatabase(boolean isSelectCategories, String mCategoryName) {
+            this.isSelectCategories = isSelectCategories;
+            this.mCategoryName      = mCategoryName;
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
 
-            final MoneyControlDatabase database = MoneyControlDatabase.getDatabase(CategoriesActivity.this);
-
-            CategoryDao categoryDao         = database.categoryDao();
-            List<CategoryModel> categories  = categoryDao.getAllCategories();
-
-            for (CategoryModel categoryModel : categories)
-                mCategoriesTitlesArrayList.add(categoryModel.getCategoryName());
+            if(isSelectCategories)
+                selectCategories();
+            else
+                insertCategory(mCategoryName);
 
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
 
-            setAdapter();
+            if(isSelectCategories) {
+                mNoCategoriesTxt.setVisibility(mCategoriesTitlesArrayList.isEmpty() ? View.VISIBLE : View.GONE);
+                mCategoriesAdapter.notifyDataSetChanged();
+            }
+            else
+                selectData();
+        }
+
+        private void selectCategories(){
+
+            mCategoriesTitlesArrayList.clear();
+            mCategoriesArrayList.clear();
+            CategoryDao categoryDao         = mDatabase.categoryDao();
+            mCategoriesArrayList            = (ArrayList<CategoryModel>) categoryDao.getAllCategories();
+
+            for (CategoryModel categoryModel : mCategoriesArrayList)
+                mCategoriesTitlesArrayList.add(categoryModel.getCategoryName());
+        }
+
+        private void insertCategory(String categoryName){
+            CategoryDao categoryDao         = mDatabase.categoryDao();
+            categoryDao.insert(new CategoryModel(categoryName, -1));
         }
     }
 }
