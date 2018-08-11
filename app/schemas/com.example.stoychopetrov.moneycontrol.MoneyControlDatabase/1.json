@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b87c2ae25f687b6225fea4a39183c459",
+    "identityHash": "384d040cd7850080728c5fb3ddc301b7",
     "entities": [
       {
         "tableName": "income_expenses_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mAmount` REAL NOT NULL, `mDate` TEXT, `mDescription` TEXT, `mIsDebit` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mAmount` REAL NOT NULL, `mDate` TEXT, `mDescription` TEXT, `mIsDebit` INTEGER NOT NULL, `mCategoryId` INTEGER NOT NULL, FOREIGN KEY(`mCategoryId`) REFERENCES `categories_table`(`mId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "mId",
@@ -37,6 +37,12 @@
             "columnName": "mIsDebit",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "mCategoryId",
+            "columnName": "mCategoryId",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -45,12 +51,33 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_income_expenses_table_mCategoryId",
+            "unique": false,
+            "columnNames": [
+              "mCategoryId"
+            ],
+            "createSql": "CREATE  INDEX `index_income_expenses_table_mCategoryId` ON `${TABLE_NAME}` (`mCategoryId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories_table",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mCategoryId"
+            ],
+            "referencedColumns": [
+              "mId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "categories_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mCategoryName` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mCategoryName` TEXT, `mCategoryId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "mId",
@@ -63,6 +90,12 @@
             "columnName": "mCategoryName",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mCategoryId",
+            "columnName": "mCategoryId",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -77,7 +110,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"b87c2ae25f687b6225fea4a39183c459\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"384d040cd7850080728c5fb3ddc301b7\")"
     ]
   }
 }

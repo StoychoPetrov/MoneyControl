@@ -10,7 +10,7 @@ import com.example.stoychopetrov.moneycontrol.interfaces.IncomeExpensesDao;
 import com.example.stoychopetrov.moneycontrol.models.CategoryModel;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
-@Database(entities = {IncomeExpensesModel.class, CategoryModel.class}, version = 2)
+@Database(entities = {IncomeExpensesModel.class, CategoryModel.class}, version = 1)
 public abstract class MoneyControlDatabase extends RoomDatabase {
 
     public abstract IncomeExpensesDao   incomeExpensesDao();

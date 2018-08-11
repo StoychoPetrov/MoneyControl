@@ -136,20 +136,28 @@ public class CategoriesActivity extends AppCompatActivity
                 selectData();
         }
 
-        private void selectCategories(){
+        private void selectCategories() {
 
-            mCategoriesTitlesArrayList.clear();
-            mCategoriesArrayList.clear();
-            CategoryDao categoryDao         = mDatabase.categoryDao();
-            mCategoriesArrayList            = (ArrayList<CategoryModel>) categoryDao.getAllCategories();
+            try {
+                mCategoriesTitlesArrayList.clear();
+                mCategoriesArrayList.clear();
+                CategoryDao categoryDao = mDatabase.categoryDao();
+                mCategoriesArrayList = (ArrayList<CategoryModel>) categoryDao.getAllCategories();
 
-            for (CategoryModel categoryModel : mCategoriesArrayList)
-                mCategoriesTitlesArrayList.add(categoryModel.getCategoryName());
+                for (CategoryModel categoryModel : mCategoriesArrayList)
+                    mCategoriesTitlesArrayList.add(categoryModel.getCategoryName());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
-        private void insertCategory(String categoryName){
-            CategoryDao categoryDao         = mDatabase.categoryDao();
-            categoryDao.insert(new CategoryModel(categoryName, -1));
+        private void insertCategory(String categoryName) {
+            try {
+                CategoryDao categoryDao = mDatabase.categoryDao();
+                categoryDao.insert(new CategoryModel(categoryName, -1));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 }
