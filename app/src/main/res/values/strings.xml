@@ -13,4 +13,11 @@
     <string name="cancel">Отхвърли</string>
     <string name="save">Запази</string>
     <string name="please_type_name">Моля, въведете име на категория!</string>
+    <string name="today">Днес</string>
+    <string name="yesterday">Вчера</string>
+    <string name="successful_transaction_added">Успешно е добавено ново движение</string>
+    <string name="credit">Кредит</string>
+    <string name="debit">Дебит</string>
+    <string name="total">Общо:</string>
+    <string name="last_month">Последен месец:</string>
 </resources>

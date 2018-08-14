@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,13 +27,15 @@ import java.util.Locale;
 
 public class AddTransactionActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private ImageView       mBackArrowImg;
-    private EditText        mDateEdt;
-    private EditText        mCategoryEdt;
-    private EditText        mSubCategoryEdt;
-    private EditText        mAmountEdt;
-    private EditText        mDescriptionEdt;
-    private Button          mSaveBtn;
+    private ImageView           mBackArrowImg;
+    private EditText            mDateEdt;
+    private EditText            mCategoryEdt;
+    private EditText            mSubCategoryEdt;
+    private EditText            mAmountEdt;
+    private EditText            mDescriptionEdt;
+    private Button              mSaveBtn;
+    private AppCompatCheckBox   mDebitCheckbox;
+    private AppCompatCheckBox   mCreditCheckbox;
 
     private CategoryModel   mSelectedCategoryModel;
 
@@ -53,6 +57,8 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         mAmountEdt      = findViewById(R.id.amount_edt);
         mDescriptionEdt = findViewById(R.id.description_edt);
         mSaveBtn        = findViewById(R.id.save_btn);
+        mDebitCheckbox  = findViewById(R.id.debit_checkbox);
+        mCreditCheckbox = findViewById(R.id.credit_checkbox);
 
         TextView titleTxt = findViewById(R.id.title_txt);
         titleTxt.setText(R.string.add_transaction);
@@ -74,6 +80,30 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         mDateEdt.setOnClickListener(this);
         mCategoryEdt.setOnClickListener(this);
         mSaveBtn.setOnClickListener(this);
+
+        mAmountEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus && !mAmountEdt.getText().toString().isEmpty())
+                    mAmountEdt.setText(Utils.formatAmount(mAmountEdt.getText().toString()));
+            }
+        });
+
+        mCreditCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                    mDebitCheckbox.setChecked(false);
+            }
+        });
+
+        mDebitCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                    mCreditCheckbox.setChecked(false);
+            }
+        });
     }
 
     private void showDatePicker(){
@@ -86,8 +116,8 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
 
-                String myFormat = "dd/MM/yyyy"; //In which you need put here
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
+                String myFormat = "dd-MMM-yyyy"; //In which you need put here
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("bg"));
 
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, monthOfYear);
@@ -125,6 +155,10 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         }
 
         if(mDescriptionEdt.getText().toString().isEmpty()){
+
+        }
+
+        if(!mDebitCheckbox.isChecked() && !mCreditCheckbox.isChecked()){
 
         }
 
@@ -169,6 +203,7 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
             incomeExpensesModel.setCategoryId(mSelectedCategoryModel.getId());
             incomeExpensesModel.setAmount(Double.parseDouble(mAmountEdt.getText().toString()));
             incomeExpensesModel.setDescription(mDescriptionEdt.getText().toString());
+            incomeExpensesModel.setIsDebit(mDebitCheckbox.isChecked());
 
             mDatabase.incomeExpensesDao().insert(incomeExpensesModel);
 
@@ -179,7 +214,8 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            Toast.makeText(AddTransactionActivity.this, "Успешно е добавено ново движение", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddTransactionActivity.this, R.string.successful_transaction_added, Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
             finish();
         }
     }

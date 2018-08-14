@@ -13,10 +13,18 @@ import android.widget.TextView;
 import com.example.stoychopetrov.moneycontrol.MoneyControlDatabase;
 import com.example.stoychopetrov.moneycontrol.R;
 import com.example.stoychopetrov.moneycontrol.TransactionsAdapter;
+import com.example.stoychopetrov.moneycontrol.customClasses.Utils;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -69,6 +77,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == Utils.REQUEST_CODE_ADD_TRANSACTION && resultCode == RESULT_OK){
+            selectTransactions();
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         if(view.getId() == mBackArrowImg.getId()){
 
@@ -78,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if(view.getId() == mAddFAB.getId()){
             Intent intent = new Intent(this, AddTransactionActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, Utils.REQUEST_CODE_ADD_TRANSACTION);
         }
     }
 
@@ -95,6 +112,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            Collections.sort(mTransactionsArrayList, new Comparator<IncomeExpensesModel>() {
+                @Override
+                public int compare(IncomeExpensesModel o1, IncomeExpensesModel o2) {
+
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", new Locale("bg"));
+
+                    try {
+                        Date first  = simpleDateFormat.parse(o1.getDate());
+                        Date second = simpleDateFormat.parse(o2.getDate());
+
+                        return first.compareTo(second);
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    return 0;
+                }
+            });
+
+            Collections.reverse(mTransactionsArrayList);
 
             runOnUiThread(new Runnable() {
                 @Override

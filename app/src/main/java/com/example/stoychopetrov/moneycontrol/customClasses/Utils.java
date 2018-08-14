@@ -1,5 +1,7 @@
 package com.example.stoychopetrov.moneycontrol.customClasses;
 
+import java.text.DecimalFormat;
+
 public class Utils {
 
     // INTENT EXTRAS
@@ -9,4 +11,11 @@ public class Utils {
     // REQUEST CODES
     public static final int REQUEST_CODE_CHOOSE_CATEGORY        = 0;
     public static final int REQUEST_CODE_CHOOSE_SUBCATEGORY     = 1;
+    public static final int REQUEST_CODE_ADD_TRANSACTION        = 2;
+
+    public static String formatAmount(String amount){
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+
+        return decimalFormat.format(Double.parseDouble(amount));
+    }
 }

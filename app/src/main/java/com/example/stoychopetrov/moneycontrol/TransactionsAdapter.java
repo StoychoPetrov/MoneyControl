@@ -11,10 +11,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.stoychopetrov.moneycontrol.customClasses.Utils;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class TransactionsAdapter extends ArrayAdapter<IncomeExpensesModel> {
 
@@ -35,39 +43,85 @@ public class TransactionsAdapter extends ArrayAdapter<IncomeExpensesModel> {
         ViewHolder holder;
         if(convertView == null){
 
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_transaction, null, false);
-            holder      = new ViewHolder(convertView);
+            if(position != 0)
+                convertView = LayoutInflater.from(mContext).inflate(R.layout.item_transaction, null, false);
+            else
+                convertView = LayoutInflater.from(mContext).inflate(R.layout.transactions_header, null, false);
+
+            holder      = new ViewHolder(convertView, position);
             convertView.setTag(holder);
         }
 
         holder = (ViewHolder) convertView.getTag();
 
-        IncomeExpensesModel incomeExpensesModel = mTransactionsArrayList.get(position);
+        if(position == 0){
 
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        }
+        else {
+            IncomeExpensesModel incomeExpensesModel = mTransactionsArrayList.get(position);
 
-        String amount = incomeExpensesModel.getIsDebit() ? "-" : "" + decimalFormat.format(incomeExpensesModel.getAmount()) + " лв.";
-        holder.mAmountTxt.setText(amount);
+            SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", new Locale("bg"));
+            SimpleDateFormat secondFormat = new SimpleDateFormat("dd.MM.yyyy", new Locale("bg"));
 
-        holder.mAmountTxt.setTextColor(ContextCompat.getColor(mContext, incomeExpensesModel.getIsDebit() ? android.R.color.holo_red_light : android.R.color.holo_green_light));
 
-        holder.mDescrTxt.setText(incomeExpensesModel.getDescription());
+            try {
+                Date date = format.parse(incomeExpensesModel.getDate());
 
-        holder.mDateTxt.setText(incomeExpensesModel.getDate());
+                Calendar now = Calendar.getInstance();
+                Calendar dateCalendar = Calendar.getInstance();
+                dateCalendar.setTime(date);
+
+                if (now.get(Calendar.DATE) == dateCalendar.get(Calendar.DATE))
+                    holder.mDateTxt.setText(R.string.today);
+                else if (now.get(Calendar.DATE) - dateCalendar.get(Calendar.DATE) == 1)
+                    holder.mDateTxt.setText(R.string.yesterday);
+                else
+                    holder.mDateTxt.setText(secondFormat.format(date));
+
+                if (position != 1 && mTransactionsArrayList.get(position - 1).getDate().equalsIgnoreCase(incomeExpensesModel.getDate()))
+                    holder.mDateTxt.setVisibility(View.GONE);
+                else
+                    holder.mDateTxt.setVisibility(View.VISIBLE);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String amount = (incomeExpensesModel.getIsDebit() ? "-" : "+") + Utils.formatAmount(String.valueOf(incomeExpensesModel.getAmount())) + " лв.";
+            holder.mAmountTxt.setText(amount);
+
+            holder.mAmountTxt.setTextColor(ContextCompat.getColor(mContext, incomeExpensesModel.getIsDebit() ? android.R.color.holo_red_dark : android.R.color.holo_green_dark));
+
+            holder.mDescrTxt.setText(incomeExpensesModel.getDescription());
+        }
 
         return convertView;
     }
 
+    @Override
+    public int getCount() {
+        return mTransactionsArrayList.size() + 1;
+    }
+
     class ViewHolder {
 
-        public TextView mDescrTxt;
-        public TextView mAmountTxt;
-        public TextView mDateTxt;
+        TextView mDescrTxt;
+        TextView mAmountTxt;
+        TextView mDateTxt;
+        TextView mTotalTxt;
+        TextView mDebitTxt;
+        TextView mCreditTxt;
 
-        private ViewHolder(View itemView){
-            mDescrTxt       = itemView.findViewById(R.id.descr_txt);
-            mAmountTxt      = itemView.findViewById(R.id.amount_txt);
-            mDateTxt        = itemView.findViewById(R.id.date_txt);
+        private ViewHolder(View itemView, int position) {
+            if (position != 0) {
+                mDescrTxt = itemView.findViewById(R.id.descr_txt);
+                mAmountTxt = itemView.findViewById(R.id.amount_txt);
+                mDateTxt = itemView.findViewById(R.id.date_txt);
+            } else {
+                mTotalTxt = itemView.findViewById(R.id.total_txt);
+                mCreditTxt = itemView.findViewById(R.id.montly_credit_txt);
+                mDebitTxt = itemView.findViewById(R.id.montly_debit_txt);
+            }
         }
     }
 }
