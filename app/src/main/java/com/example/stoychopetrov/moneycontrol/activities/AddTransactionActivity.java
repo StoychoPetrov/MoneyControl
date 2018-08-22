@@ -21,6 +21,7 @@ import com.example.stoychopetrov.moneycontrol.customClasses.Utils;
 import com.example.stoychopetrov.moneycontrol.models.CategoryModel;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -196,10 +197,17 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         @Override
         protected Void doInBackground(Void... voids) {
 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy", new Locale("bg"));
             final MoneyControlDatabase mDatabase = MoneyControlDatabase.getDatabase(AddTransactionActivity.this);
 
             IncomeExpensesModel incomeExpensesModel = new IncomeExpensesModel();
-            incomeExpensesModel.setDate(mDateEdt.getText().toString());
+
+            try {
+                incomeExpensesModel.setDate(dateFormat.parse(mDateEdt.getText().toString()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
             incomeExpensesModel.setCategoryId(mSelectedCategoryModel.getId());
             incomeExpensesModel.setAmount(Double.parseDouble(mAmountEdt.getText().toString()));
             incomeExpensesModel.setDescription(mDescriptionEdt.getText().toString());

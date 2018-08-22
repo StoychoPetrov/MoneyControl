@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -21,4 +22,7 @@ public interface IncomeExpensesDao {
 
     @Query("SELECT * from income_expenses_table")
     List<IncomeExpensesModel> getAllIncomeExpenses();
+
+    @Query("SELECT SUM(mAmount) FROM income_expenses_table WHERE mIsDebit = :isDebit AND mDate BETWEEN :from AND :to")
+    double getIncomeExpensesTotal(int isDebit, Date from, Date to);
 }

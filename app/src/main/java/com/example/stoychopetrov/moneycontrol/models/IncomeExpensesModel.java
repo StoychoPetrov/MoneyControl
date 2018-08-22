@@ -5,6 +5,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.Date;
+
 @Entity(tableName = "income_expenses_table", indices = {@Index("mCategoryId")}, foreignKeys = {
         @ForeignKey(
                 entity = CategoryModel.class,
@@ -19,7 +21,7 @@ public class IncomeExpensesModel {
     private long    mId;
 
     private double  mAmount;
-    private String  mDate;
+    private Date    mDate;
     private String  mDescription;
     private boolean mIsDebit;
     private long    mCategoryId;
@@ -48,11 +50,11 @@ public class IncomeExpensesModel {
         this.mIsDebit = mIsDebit;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return mDate;
     }
 
-    public void setDate(String mDate) {
+    public void setDate(Date mDate) {
         this.mDate = mDate;
     }
 

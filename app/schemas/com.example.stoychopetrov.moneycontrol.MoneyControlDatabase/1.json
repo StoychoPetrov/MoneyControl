@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "384d040cd7850080728c5fb3ddc301b7",
+    "identityHash": "380af887dc387c4950270b13db9a3a8d",
     "entities": [
       {
         "tableName": "income_expenses_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mAmount` REAL NOT NULL, `mDate` TEXT, `mDescription` TEXT, `mIsDebit` INTEGER NOT NULL, `mCategoryId` INTEGER NOT NULL, FOREIGN KEY(`mCategoryId`) REFERENCES `categories_table`(`mId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mAmount` REAL NOT NULL, `mDate` INTEGER, `mDescription` TEXT, `mIsDebit` INTEGER NOT NULL, `mCategoryId` INTEGER NOT NULL, FOREIGN KEY(`mCategoryId`) REFERENCES `categories_table`(`mId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "mId",
@@ -23,7 +23,7 @@
           {
             "fieldPath": "mDate",
             "columnName": "mDate",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -110,7 +110,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"384d040cd7850080728c5fb3ddc301b7\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"380af887dc387c4950270b13db9a3a8d\")"
     ]
   }
 }

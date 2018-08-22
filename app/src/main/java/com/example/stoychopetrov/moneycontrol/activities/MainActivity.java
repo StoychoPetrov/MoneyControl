@@ -14,11 +14,13 @@ import com.example.stoychopetrov.moneycontrol.MoneyControlDatabase;
 import com.example.stoychopetrov.moneycontrol.R;
 import com.example.stoychopetrov.moneycontrol.TransactionsAdapter;
 import com.example.stoychopetrov.moneycontrol.customClasses.Utils;
+import com.example.stoychopetrov.moneycontrol.interfaces.IncomeExpensesDao;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView               mBackArrowImg;
     private FloatingActionButton    mAddFAB;
     private ListView                mTransactionsListView;
+
+    private double                         mDebit;
+    private double                         mCredit;
+    private double                         mTotal;
 
     private TransactionsAdapter            mAdapter;
     private ArrayList<IncomeExpensesModel> mTransactionsArrayList   = new ArrayList<>();
@@ -116,20 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Collections.sort(mTransactionsArrayList, new Comparator<IncomeExpensesModel>() {
                 @Override
                 public int compare(IncomeExpensesModel o1, IncomeExpensesModel o2) {
-
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", new Locale("bg"));
-
-                    try {
-                        Date first  = simpleDateFormat.parse(o1.getDate());
-                        Date second = simpleDateFormat.parse(o2.getDate());
-
-                        return first.compareTo(second);
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    return 0;
+                    return o1.getDate().compareTo(o2.getDate());
                 }
             });
 
@@ -147,6 +140,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mTransactionsArrayList.clear();
             MoneyControlDatabase database = MoneyControlDatabase.getDatabase(MainActivity.this);
             mTransactionsArrayList.addAll(database.incomeExpensesDao().getAllIncomeExpenses());
+
+            Calendar start = Calendar.getInstance();
+            Calendar end   = Calendar.getInstance();
+
+            Date minDate = new Date(Long.MIN_VALUE);
+
+            start.set(Calendar.DAY_OF_MONTH, 1);
+
+            IncomeExpensesDao dao = database.incomeExpensesDao();
+
+            mDebit  = dao.getIncomeExpensesTotal(1, start.getTime(), end.getTime());
+            mCredit = dao.getIncomeExpensesTotal(0, start.getTime(), end.getTime());
+            mTotal  = dao.getIncomeExpensesTotal(0, minDate, end.getTime()) - dao.getIncomeExpensesTotal(1, minDate, end.getTime());;
+
+            mAdapter.setmDebit(mDebit);
+            mAdapter.setmCredit(mCredit);
+            mAdapter.setmTotal(mTotal);
         }
     }
 }

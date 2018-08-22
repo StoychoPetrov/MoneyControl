@@ -3,14 +3,17 @@ package com.example.stoychopetrov.moneycontrol;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.example.stoychopetrov.moneycontrol.interfaces.CategoryDao;
 import com.example.stoychopetrov.moneycontrol.interfaces.IncomeExpensesDao;
 import com.example.stoychopetrov.moneycontrol.models.CategoryModel;
+import com.example.stoychopetrov.moneycontrol.models.Converters;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
 @Database(entities = {IncomeExpensesModel.class, CategoryModel.class}, version = 1)
+@TypeConverters({Converters.class})
 public abstract class MoneyControlDatabase extends RoomDatabase {
 
     public abstract IncomeExpensesDao   incomeExpensesDao();
