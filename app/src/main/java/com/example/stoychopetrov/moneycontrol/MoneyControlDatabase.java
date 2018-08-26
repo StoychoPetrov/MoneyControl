@@ -12,7 +12,7 @@ import com.example.stoychopetrov.moneycontrol.models.CategoryModel;
 import com.example.stoychopetrov.moneycontrol.models.Converters;
 import com.example.stoychopetrov.moneycontrol.models.IncomeExpensesModel;
 
-@Database(entities = {IncomeExpensesModel.class, CategoryModel.class}, version = 1)
+@Database(entities = {IncomeExpensesModel.class, CategoryModel.class}, version = 3)
 @TypeConverters({Converters.class})
 public abstract class MoneyControlDatabase extends RoomDatabase {
 
@@ -27,6 +27,7 @@ public abstract class MoneyControlDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             MoneyControlDatabase.class, "money_control_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

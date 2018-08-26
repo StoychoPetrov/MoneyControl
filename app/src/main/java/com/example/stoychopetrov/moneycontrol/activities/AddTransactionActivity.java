@@ -38,7 +38,8 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
     private AppCompatCheckBox   mDebitCheckbox;
     private AppCompatCheckBox   mCreditCheckbox;
 
-    private CategoryModel   mSelectedCategoryModel;
+    private CategoryModel       mSelectedSubCategory;
+    private CategoryModel       mSelectedCategoryModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,7 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
         mBackArrowImg.setOnClickListener(this);
         mDateEdt.setOnClickListener(this);
         mCategoryEdt.setOnClickListener(this);
+        mSubCategoryEdt.setOnClickListener(this);
         mSaveBtn.setOnClickListener(this);
 
         mAmountEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -133,11 +135,11 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
                 calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void startCategoryActivity(int requestCode){
-        Intent intent = new Intent(this, CategoriesActivity.class);
-        if(requestCode == Utils.REQUEST_CODE_CHOOSE_SUBCATEGORY)
-            intent.putExtra(Utils.INTENT_EXTRA_SUBCATEGORY, true);
-        startActivityForResult(intent, requestCode);
+    private void startCategoryActivity(int requestCode) {
+            Intent intent = new Intent(this, CategoriesActivity.class);
+            if (requestCode == Utils.REQUEST_CODE_CHOOSE_SUBCATEGORY)
+                intent.putExtra(Utils.INTENT_CATEGORY_ID, mSelectedCategoryModel.getId());
+            startActivityForResult(intent, requestCode);
     }
 
     private void onSave(){
@@ -175,8 +177,10 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
             showDatePicker();
         else if(v.getId() == mCategoryEdt.getId())
             startCategoryActivity(Utils.REQUEST_CODE_CHOOSE_CATEGORY);
-        else if(v.getId() == mSubCategoryEdt.getId())
-            startCategoryActivity(Utils.REQUEST_CODE_CHOOSE_SUBCATEGORY);
+        else if(v.getId() == mSubCategoryEdt.getId()) {
+            if (mSelectedCategoryModel != null)
+                startCategoryActivity(Utils.REQUEST_CODE_CHOOSE_SUBCATEGORY);
+        }
         else if(v.getId() == mSaveBtn.getId())
             onSave();
     }
@@ -189,6 +193,10 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
             mSelectedCategoryModel  = data.getParcelableExtra(Utils.INTENT_EXTRA_CATEGORY_NAME);
 
             mCategoryEdt.setText(mSelectedCategoryModel.getCategoryName());
+        }
+        else if (requestCode == Utils.REQUEST_CODE_CHOOSE_SUBCATEGORY && resultCode == RESULT_OK){
+            mSelectedSubCategory    = data.getParcelableExtra(Utils.INTENT_EXTRA_CATEGORY_NAME);
+            mSubCategoryEdt.setText(mSelectedSubCategory.getCategoryName());
         }
     }
 
@@ -208,7 +216,7 @@ public class AddTransactionActivity extends AppCompatActivity implements View.On
                 e.printStackTrace();
             }
 
-            incomeExpensesModel.setCategoryId(mSelectedCategoryModel.getId());
+            incomeExpensesModel.setCategoryId(mSelectedSubCategory.getId());
             incomeExpensesModel.setAmount(Double.parseDouble(mAmountEdt.getText().toString()));
             incomeExpensesModel.setDescription(mDescriptionEdt.getText().toString());
             incomeExpensesModel.setIsDebit(mDebitCheckbox.isChecked());

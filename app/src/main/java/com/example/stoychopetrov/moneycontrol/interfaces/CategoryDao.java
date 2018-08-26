@@ -19,6 +19,6 @@ public interface CategoryDao {
     @Delete
     void delete(CategoryModel categoryModel);
 
-    @Query("SELECT * FROM categories_table")
-    List<CategoryModel> getAllCategories();
+    @Query("SELECT * FROM categories_table WHERE mCategoryId = :categoryId")
+    List<CategoryModel> getAllCategories(long categoryId);
 }

@@ -36,11 +36,14 @@ public class CategoriesActivity extends AppCompatActivity
 
     private boolean                     mIsSubcategory              = false;
 
+    private long                        mCategoryId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
+        mCategoryId     = getIntent().getLongExtra(Utils.INTENT_CATEGORY_ID, -1);
         mIsSubcategory = getIntent().getBooleanExtra(Utils.INTENT_EXTRA_SUBCATEGORY, false);
 
         initUI();
@@ -55,7 +58,7 @@ public class CategoriesActivity extends AppCompatActivity
         mAddBtn                 = findViewById(R.id.add_btn);
         mNoCategoriesTxt        = findViewById(R.id.no_categories_txt);
 
-        ((TextView) findViewById(R.id.title_txt)).setText(R.string.choose_category);
+        ((TextView) findViewById(R.id.title_txt)).setText(mCategoryId == 1 ? R.string.choose_category : R.string.select_subcategory);
     }
 
     private void setListeners(){
@@ -142,7 +145,7 @@ public class CategoriesActivity extends AppCompatActivity
                 mCategoriesTitlesArrayList.clear();
                 mCategoriesArrayList.clear();
                 CategoryDao categoryDao = mDatabase.categoryDao();
-                mCategoriesArrayList = (ArrayList<CategoryModel>) categoryDao.getAllCategories();
+                mCategoriesArrayList = (ArrayList<CategoryModel>) categoryDao.getAllCategories(mCategoryId);
 
                 for (CategoryModel categoryModel : mCategoriesArrayList)
                     mCategoriesTitlesArrayList.add(categoryModel.getCategoryName());
@@ -154,7 +157,7 @@ public class CategoriesActivity extends AppCompatActivity
         private void insertCategory(String categoryName) {
             try {
                 CategoryDao categoryDao = mDatabase.categoryDao();
-                categoryDao.insert(new CategoryModel(categoryName, -1));
+                categoryDao.insert(new CategoryModel(categoryName, mCategoryId));
             }catch (Exception e){
                 e.printStackTrace();
             }

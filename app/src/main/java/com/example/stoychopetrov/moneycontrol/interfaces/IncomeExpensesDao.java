@@ -20,8 +20,8 @@ public interface IncomeExpensesDao {
     @Delete
     void delete(IncomeExpensesModel incomeExpensesModel);
 
-    @Query("SELECT * from income_expenses_table")
-    List<IncomeExpensesModel> getAllIncomeExpenses();
+    @Query("SELECT * FROM income_expenses_table WHERE mDescription LIKE :search || '%'")
+    List<IncomeExpensesModel> getAllIncomeExpenses(String search);
 
     @Query("SELECT SUM(mAmount) FROM income_expenses_table WHERE mIsDebit = :isDebit AND mDate BETWEEN :from AND :to")
     double getIncomeExpensesTotal(int isDebit, Date from, Date to);
